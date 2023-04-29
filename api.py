@@ -2,31 +2,32 @@ import requests
 import pprint as p
 
 
-def get_headlines():
-    #  This app requires your own api key.  Visit NewsAPI.org.
-    api_key = ''
+class APIRequest():
+    def __init__(self):
+        #  This app requires your own api key.  Visit NewsAPI.org.
+        api_key = ''
+        url = ('https://newsapi.org/v2/top-headlines?'
+               'sources=bbc-news&'
+               f'apiKey={api_key}')
+        r = requests.get(url)
+        self.json_data = r.json()
+        if (r.status_code == 200):
+            print("The request was a success!")
+        elif (r.status_code == 404):
+            #  consider a message box here - so user know why headlines aren't showing...
+            print("Result not found!")
+            print('Might need to debug something.')
 
-    url = ('https://newsapi.org/v2/top-headlines?'
-           'sources=bbc-news&'
-           f'apiKey={api_key}')
-
-    r = requests.get(url)
-
-    d = r.json()
-
-    if (r.status_code == 200):
-        print("The request was a success!")
-
-        p.pprint(d)
-
+    def get_headlines(self):
         headlines = []
-
-        for article in d['articles']:
+        for article in self.json_data['articles']:
             headline = article['title']
             headlines.append(headline)
+        return headlines
 
-    elif (r.status_code == 404):
-        print("Result not found!")
-        print('Might need to debug something.')
+    def get_description(self, index):
+        return self.json_data['articles'][index]['description']
 
-    return headlines
+
+get = APIRequest()
+p.pprint(get.json_data)
